@@ -5,7 +5,7 @@ create extension if not exists "uuid-ossp";
 create table if not exists events (
   id uuid primary key default uuid_generate_v4(),
   title varchar(50) not null,
-  passcode char(4) not null,
+  passcode char(6) not null,
   start_date date not null,
   creator_token uuid default uuid_generate_v4(),
   is_locked boolean default false,
@@ -35,31 +35,78 @@ create index if not exists idx_responses_fingerprint on responses(user_fingerpri
 alter table events enable row level security;
 alter table responses enable row level security;
 
--- Policies for events (allow anonymous read/write)
+-- Policies for events
+-- Read: Allow reading non-expired events (hide passcode via API)
 create policy "Allow anonymous read events"
   on events for select
-  using (true);
+  using (expires_at > now());
 
+-- Insert: Allow creating new events with valid data
 create policy "Allow anonymous insert events"
   on events for insert
-  with check (true);
+  with check (
+    title is not null and
+    length(title) between 1 and 50 and
+    passcode is not null and
+    length(passcode) = 6 and
+    start_date is not null
+  );
 
+-- Update: Only allow updating is_locked and final_slot fields
+-- (creator_token verification is done at API level)
 create policy "Allow anonymous update events"
   on events for update
-  using (true);
+  using (expires_at > now())
+  with check (
+    -- Prevent modifying sensitive fields
+    title = (select title from events where id = events.id) and
+    passcode = (select passcode from events where id = events.id) and
+    creator_token = (select creator_token from events where id = events.id)
+  );
 
--- Policies for responses (allow anonymous read/write)
+-- Policies for responses
+-- Read: Allow reading responses for non-expired events
 create policy "Allow anonymous read responses"
   on responses for select
-  using (true);
+  using (
+    exists (
+      select 1 from events
+      where events.id = responses.event_id
+      and events.expires_at > now()
+    )
+  );
 
+-- Insert: Allow inserting responses with valid data
 create policy "Allow anonymous insert responses"
   on responses for insert
-  with check (true);
+  with check (
+    nickname is not null and
+    length(nickname) between 1 and 20 and
+    user_fingerprint is not null and
+    exists (
+      select 1 from events
+      where events.id = event_id
+      and events.expires_at > now()
+      and events.is_locked = false
+    )
+  );
 
+-- Update: Allow updating own responses (by fingerprint)
 create policy "Allow anonymous update responses"
   on responses for update
-  using (true);
+  using (
+    exists (
+      select 1 from events
+      where events.id = responses.event_id
+      and events.expires_at > now()
+      and events.is_locked = false
+    )
+  )
+  with check (
+    -- Can only update availability, not nickname or fingerprint
+    nickname = (select nickname from responses r where r.id = responses.id) and
+    user_fingerprint = (select user_fingerprint from responses r where r.id = responses.id)
+  );
 
 -- Function to get heatmap data for an event
 create or replace function get_event_heatmap(target_event_id uuid)
@@ -109,12 +156,12 @@ begin
 end;
 $$;
 
--- Generate random 4-digit passcode
+-- Generate random 6-digit passcode
 create or replace function generate_passcode()
-returns char(4)
+returns char(6)
 language plpgsql
 as $$
 begin
-  return lpad(floor(random() * 10000)::text, 4, '0');
+  return lpad(floor(random() * 1000000)::text, 6, '0');
 end;
 $$;

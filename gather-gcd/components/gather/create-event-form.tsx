@@ -9,9 +9,12 @@ interface CreateEventFormProps {
   isLoading?: boolean;
 }
 
-// Generate a random 4-digit passcode
+// Passcode length constant
+const PASSCODE_LENGTH = 6;
+
+// Generate a random 6-digit passcode
 function generatePasscode(): string {
-  return Math.floor(1000 + Math.random() * 9000).toString();
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 export function CreateEventForm({ onSubmit, isLoading = false }: CreateEventFormProps) {
@@ -31,7 +34,7 @@ export function CreateEventForm({ onSubmit, isLoading = false }: CreateEventForm
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (title.trim().length < 1 || nickname.trim().length < 1 || passcode.length !== 4) return;
+    if (title.trim().length < 1 || nickname.trim().length < 1 || passcode.length !== PASSCODE_LENGTH) return;
     await onSubmit(title.trim(), nickname.trim(), passcode);
   };
 
@@ -40,12 +43,12 @@ export function CreateEventForm({ onSubmit, isLoading = false }: CreateEventForm
   };
 
   const handlePasscodeChange = (value: string) => {
-    // Only allow digits and max 4 characters
-    const filtered = value.replace(/\D/g, "").slice(0, 4);
+    // Only allow digits and max 6 characters
+    const filtered = value.replace(/\D/g, "").slice(0, PASSCODE_LENGTH);
     setPasscode(filtered);
   };
 
-  const isValid = title.trim().length >= 1 && nickname.trim().length >= 1 && passcode.length === 4;
+  const isValid = title.trim().length >= 1 && nickname.trim().length >= 1 && passcode.length === PASSCODE_LENGTH;
 
   return (
     <motion.form
@@ -151,13 +154,13 @@ export function CreateEventForm({ onSubmit, isLoading = false }: CreateEventForm
             inputMode="numeric"
             value={passcode}
             onChange={(e) => handlePasscodeChange(e.target.value)}
-            placeholder="输入4位数字口令"
+            placeholder="输入6位数字口令"
             className="w-full px-4 py-3 rounded-2xl glass text-center font-serif text-2xl tracking-widest text-foreground placeholder:text-muted-foreground placeholder:text-base placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-            maxLength={4}
+            maxLength={6}
           />
         )}
         <p className="text-xs text-muted-foreground">
-          4位数字口令，用于参与者进入活动
+          6位数字口令，用于参与者进入活动
         </p>
       </div>
 

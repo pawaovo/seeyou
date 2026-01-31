@@ -402,7 +402,7 @@ function AuthGateWithVerification({
   onAuthenticated: (nickname: string) => void;
   defaultNickname: string;
 }) {
-  const [code, setCode] = useState<string[]>(["", "", "", ""]);
+  const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
   const [nickname, setNickname] = useState(defaultNickname);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isCodeCorrect, setIsCodeCorrect] = useState(false);
@@ -410,13 +410,13 @@ function AuthGateWithVerification({
   const [isVerifying, setIsVerifying] = useState(false);
 
   const handleDigitPress = async (digit: string) => {
-    if (activeIndex >= 4 || isVerifying) return;
+    if (activeIndex >= 6 || isVerifying) return;
 
     const newCode = [...code];
     newCode[activeIndex] = digit;
     setCode(newCode);
 
-    if (activeIndex < 3) {
+    if (activeIndex < 5) {
       setActiveIndex(activeIndex + 1);
     } else {
       // Verify code
@@ -430,7 +430,7 @@ function AuthGateWithVerification({
         setShake(true);
         setTimeout(() => {
           setShake(false);
-          setCode(["", "", "", ""]);
+          setCode(["", "", "", "", "", ""]);
           setActiveIndex(0);
         }, 500);
       }

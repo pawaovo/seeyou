@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { format, addDays, startOfWeek } from "date-fns";
 import { zhCN } from "date-fns/locale";
@@ -65,12 +65,36 @@ export function WeekCard({
     return { date, slot: slot as "morning" | "afternoon" | "evening" };
   };
 
+  // Pre-compute slot -> users mapping for O(1) lookup (performance optimization)
+  const slotUsersMap = useMemo(() => {
+    const map: Record<string, string[]> = {};
+    for (const [user, slots] of Object.entries(allSelections)) {
+      for (const slot of slots) {
+        const key = `${slot.date}:${slot.slot}`;
+        if (!map[key]) map[key] = [];
+        if (!map[key].includes(user)) {
+          map[key].push(user);
+        }
+      }
+    }
+    return map;
+  }, [allSelections]);
+
+  // Pre-compute selected slots set for O(1) lookup
+  const selectedSlotsSet = useMemo(() => {
+    return new Set(selectedSlots.map(s => `${s.date}:${s.slot}`));
+  }, [selectedSlots]);
+
+  const isSelected = useCallback((dateStr: string, slot: "morning" | "afternoon" | "evening") => {
+    return selectedSlotsSet.has(`${dateStr}:${slot}`);
+  }, [selectedSlotsSet]);
+
   const handleDragStart = useCallback((dateStr: string, slot: "morning" | "afternoon" | "evening") => {
-    const currentlySelected = isSelected(dateStr, slot);
+    const currentlySelected = selectedSlotsSet.has(`${dateStr}:${slot}`);
     setIsDragging(true);
     setDragMode(currentlySelected ? "deselect" : "select");
     setDraggedSlots(new Set([getSlotKey(dateStr, slot)]));
-  }, [selectedSlots]);
+  }, [selectedSlotsSet]);
 
   const handleDragEnter = useCallback((dateStr: string, slot: "morning" | "afternoon" | "evening") => {
     if (!isDragging) return;
@@ -92,7 +116,7 @@ export function WeekCard({
       // Fallback: toggle each slot individually
       for (const key of draggedSlots) {
         const { date, slot } = parseSlotKey(key);
-        const currentlySelected = isSelected(date, slot);
+        const currentlySelected = selectedSlotsSet.has(`${date}:${slot}`);
         if ((dragMode === "select" && !currentlySelected) || (dragMode === "deselect" && currentlySelected)) {
           onToggleSlot(date, slot);
         }
@@ -101,7 +125,7 @@ export function WeekCard({
 
     setIsDragging(false);
     setDraggedSlots(new Set());
-  }, [isDragging, draggedSlots, dragMode, onBatchToggle, onToggleSlot]);
+  }, [isDragging, draggedSlots, dragMode, onBatchToggle, onToggleSlot, selectedSlotsSet]);
 
   // Handle touch/mouse events for drag selection
   const handlePointerDown = (dateStr: string, slot: "morning" | "afternoon" | "evening") => (e: React.PointerEvent) => {
@@ -127,28 +151,16 @@ export function WeekCard({
     handleDragEnd();
   };
 
-  const isSelected = (dateStr: string, slot: "morning" | "afternoon" | "evening") => {
-    return selectedSlots.some((s) => s.date === dateStr && s.slot === slot);
-  };
-
-  // Get users who selected a specific slot
-  const getSlotUsers = (dateStr: string, slot: "morning" | "afternoon" | "evening"): string[] => {
-    const users: string[] = [];
-    for (const [user, slots] of Object.entries(allSelections)) {
-      if (slots.some((s) => s.date === dateStr && s.slot === slot)) {
-        users.push(user);
-      }
-    }
+  // Get users who selected a specific slot - O(1) lookup
+  const getSlotUsers = useCallback((dateStr: string, slot: "morning" | "afternoon" | "evening"): string[] => {
+    const key = `${dateStr}:${slot}`;
+    const users = slotUsersMap[key] ? [...slotUsersMap[key]] : [];
     // Add current user if selected (and not already in list from allSelections)
-    if (isSelected(dateStr, slot) && !users.includes(currentUser)) {
+    if (selectedSlotsSet.has(key) && !users.includes(currentUser)) {
       users.push(currentUser);
     }
     return users;
-  };
-
-  const getParticipantCount = (dateStr: string, slot: "morning" | "afternoon" | "evening") => {
-    return getSlotUsers(dateStr, slot).length;
-  };
+  }, [slotUsersMap, selectedSlotsSet, currentUser]);
 
   return (
     <motion.div

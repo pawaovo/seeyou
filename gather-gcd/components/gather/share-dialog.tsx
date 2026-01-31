@@ -118,11 +118,11 @@ export function ShareDialog({
               活动口令
             </label>
             <div className="flex items-center gap-2">
-              <div className="flex-1 px-4 py-3 rounded-xl bg-secondary flex items-center justify-center gap-2">
+              <div className="flex-1 px-4 py-3 rounded-xl bg-secondary flex items-center justify-center gap-1">
                 {passcode.split("").map((digit, index) => (
                   <span
                     key={index}
-                    className="w-10 h-10 rounded-lg bg-card flex items-center justify-center text-xl font-serif text-foreground"
+                    className="w-8 h-10 rounded-lg bg-card flex items-center justify-center text-xl font-serif text-foreground"
                   >
                     {digit}
                   </span>
