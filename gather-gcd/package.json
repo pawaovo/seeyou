@@ -4,14 +4,12 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "build:cloudflare": "opennextjs-cloudflare build",
+    "build:pages": "npx @cloudflare/next-on-pages@1",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start",
-    "deploy": "opennextjs-cloudflare build && wrangler pages deploy"
+    "start": "next start"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "^1.0.0",
     "@supabase/supabase-js": "^2.45.0",
     "@supabase/ssr": "^0.5.0",
     "@emotion/is-prop-valid": "latest",
@@ -53,11 +51,11 @@
     "framer-motion": "^11.15.0",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
-    "next": "^16.1.5",
+    "next": "15.1.0",
     "next-themes": "^0.4.6",
-    "react": "19.2.0",
+    "react": "^18.3.1",
     "react-day-picker": "9.8.0",
-    "react-dom": "19.2.0",
+    "react-dom": "^18.3.1",
     "react-hook-form": "^7.60.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.4",
@@ -65,7 +63,6 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
-    "wrangler": "^4.0.0",
     "zod": "3.25.76"
   },
   "devDependencies": {
