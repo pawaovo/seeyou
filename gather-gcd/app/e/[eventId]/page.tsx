@@ -11,6 +11,8 @@ import { getOrCreateFingerprint } from "@/lib/fingerprint";
 import { toast } from "sonner";
 import type { TimeSlot, SlotType } from "@/types";
 
+export const runtime = "edge";
+
 const STORAGE_KEYS = {
   nickname: "gather_gcd_nickname",
   creatorTokens: "gather_gcd_creator_tokens",
