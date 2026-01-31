@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+export const runtime = "edge";
+
 // Generate a random 4-digit passcode
 function generatePasscode(): string {
   return Math.floor(1000 + Math.random() * 9000).toString();
