@@ -3,9 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "edge";
 
-// Generate a random 4-digit passcode
+// Generate a random 6-digit passcode
 function generatePasscode(): string {
-  return Math.floor(1000 + Math.random() * 9000).toString();
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 // POST: Create a new event
@@ -28,9 +28,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Use custom passcode if provided and valid, otherwise generate one
+    // Use custom passcode if provided and valid (6 digits), otherwise generate one
     let passcode = customPasscode;
-    if (!passcode || !/^\d{4}$/.test(passcode)) {
+    if (!passcode || !/^\d{6}$/.test(passcode)) {
       passcode = generatePasscode();
     }
 
