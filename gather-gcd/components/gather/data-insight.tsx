@@ -36,8 +36,6 @@ function getIntensity(count: number, maxCount: number): number {
 
 // Get color based on intensity level
 function getIntensityColor(intensity: number): string {
-  // Gradient from light to deep zen-sage
-  const alpha = Math.round(intensity * 100);
   return `rgba(117, 179, 145, ${intensity})`;
 }
 

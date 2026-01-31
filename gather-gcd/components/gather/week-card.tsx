@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState, useCallback, useMemo } from "react";
+import { useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { format, addDays, startOfWeek, getDay } from "date-fns";
+import { format, addDays, startOfWeek } from "date-fns";
 import { zhCN } from "date-fns/locale";
 
 import Image from "next/image";
