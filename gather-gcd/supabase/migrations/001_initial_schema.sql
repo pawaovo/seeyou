@@ -91,7 +91,7 @@ create policy "Allow anonymous insert responses"
     )
   );
 
--- Update: Allow updating own responses (by fingerprint)
+-- Update: Allow updating own responses (fingerprint verification done at API level)
 create policy "Allow anonymous update responses"
   on responses for update
   using (
@@ -101,11 +101,6 @@ create policy "Allow anonymous update responses"
       and events.expires_at > now()
       and events.is_locked = false
     )
-  )
-  with check (
-    -- Can only update availability, not nickname or fingerprint
-    nickname = (select nickname from responses r where r.id = responses.id) and
-    user_fingerprint = (select user_fingerprint from responses r where r.id = responses.id)
   );
 
 -- Function to get heatmap data for an event
