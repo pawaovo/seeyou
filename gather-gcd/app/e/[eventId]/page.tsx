@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, use } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { startOfWeek, differenceInWeeks } from "date-fns";
@@ -20,9 +20,9 @@ const STORAGE_KEYS = {
 export default function EventPage({
   params,
 }: {
-  params: { eventId: string };
+  params: Promise<{ eventId: string }>;
 }) {
-  const { eventId } = params;
+  const { eventId } = use(params);
   const router = useRouter();
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
