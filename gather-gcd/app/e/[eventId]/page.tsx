@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, use, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { startOfWeek, differenceInWeeks } from "date-fns";
@@ -11,8 +11,6 @@ import { getOrCreateFingerprint } from "@/lib/fingerprint";
 import { toast } from "sonner";
 import type { TimeSlot, SlotType } from "@/types";
 
-export const runtime = "edge";
-
 const STORAGE_KEYS = {
   nickname: "gather_gcd_nickname",
   creatorTokens: "gather_gcd_creator_tokens",
@@ -22,9 +20,9 @@ const STORAGE_KEYS = {
 export default function EventPage({
   params,
 }: {
-  params: Promise<{ eventId: string }>;
+  params: { eventId: string };
 }) {
-  const { eventId } = use(params);
+  const { eventId } = params;
   const router = useRouter();
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,8 +35,21 @@ export default function EventPage({
   const [eventPasscode, setEventPasscode] = useState<string>("");
   const [isCreator, setIsCreator] = useState(false);
   const [isFirstSave, setIsFirstSave] = useState(true);
+  const [defaultNickname, setDefaultNickname] = useState<string>("");
 
   const { event, responses, isLoading, error, refetch } = useEvent(eventId);
+
+  // Load default nickname from localStorage (in useEffect to avoid SSR issues)
+  useEffect(() => {
+    try {
+      const savedNickname = localStorage.getItem(STORAGE_KEYS.nickname);
+      if (savedNickname) {
+        setDefaultNickname(savedNickname);
+      }
+    } catch {
+      // localStorage not available (e.g., private browsing mode)
+    }
+  }, []);
 
   // Convert responses to selections format
   const allSelections = responsesToSelections(responses);
@@ -101,8 +112,8 @@ export default function EventPage({
     return weeksSet;
   }, [weeksWithData, addedWeeks]);
 
-  // Check if there are unsaved changes
-  const hasUnsavedChanges = useCallback(() => {
+  // Check if there are unsaved changes (memoized for performance)
+  const hasUnsavedChanges = useMemo(() => {
     if (userSelections.length !== savedSelections.length) return true;
     const sortedCurrent = [...userSelections].sort((a, b) =>
       `${a.date}-${a.slot}`.localeCompare(`${b.date}-${b.slot}`)
@@ -334,7 +345,7 @@ export default function EventPage({
         eventTitle={event.title}
         onVerify={handleVerifyPasscode}
         onAuthenticated={handleAuthenticated}
-        defaultNickname={localStorage.getItem(STORAGE_KEYS.nickname) || ""}
+        defaultNickname={defaultNickname}
       />
     );
   }
@@ -358,7 +369,7 @@ export default function EventPage({
             currentUser={currentUser}
             userSelections={userSelections}
             allSelections={allSelections}
-            hasUnsavedChanges={hasUnsavedChanges()}
+            hasUnsavedChanges={hasUnsavedChanges}
             onToggleSlot={handleToggleSlot}
             onBatchToggle={handleBatchToggle}
             onAddWeek={handleAddWeek}
