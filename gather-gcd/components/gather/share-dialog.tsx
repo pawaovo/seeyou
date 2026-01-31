@@ -148,7 +148,7 @@ export function ShareDialog({
             type="button"
             onClick={handleCopyAll}
             whileTap={{ scale: 0.98 }}
-            className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium transition-all hover:opacity-90"
+            className="w-full py-3 rounded-xl border-2 border-foreground/20 text-foreground font-medium transition-all hover:border-foreground/40 hover:bg-foreground/5"
           >
             一键复制链接和口令
           </motion.button>

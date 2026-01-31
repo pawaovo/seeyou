@@ -109,10 +109,10 @@ export function CreateEventForm({ onSubmit, isLoading = false }: CreateEventForm
               setPasscodeMode("random");
               setPasscode(generatePasscode());
             }}
-            className={`flex-1 py-2 px-3 rounded-xl text-sm transition-all ${
+            className={`flex-1 py-2 px-3 rounded-xl text-sm transition-all border-2 ${
               passcodeMode === "random"
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                ? "border-foreground/40 bg-foreground/5 text-foreground"
+                : "border-foreground/20 text-foreground hover:border-foreground/30"
             }`}
           >
             随机生成
@@ -120,10 +120,10 @@ export function CreateEventForm({ onSubmit, isLoading = false }: CreateEventForm
           <button
             type="button"
             onClick={() => setPasscodeMode("custom")}
-            className={`flex-1 py-2 px-3 rounded-xl text-sm transition-all ${
+            className={`flex-1 py-2 px-3 rounded-xl text-sm transition-all border-2 ${
               passcodeMode === "custom"
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                ? "border-foreground/40 bg-foreground/5 text-foreground"
+                : "border-foreground/20 text-foreground hover:border-foreground/30"
             }`}
           >
             自定义
@@ -179,11 +179,11 @@ export function CreateEventForm({ onSubmit, isLoading = false }: CreateEventForm
       <motion.button
         type="submit"
         disabled={isLoading || !isValid}
-        className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-medium text-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 flex items-center justify-center gap-2"
+        className="w-full py-4 rounded-2xl border-2 border-foreground/20 text-foreground font-medium text-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:border-foreground/40 hover:bg-foreground/5 flex items-center justify-center gap-2"
         whileTap={{ scale: 0.98 }}
       >
         {isLoading ? (
-          <div className="w-5 h-5 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
+          <div className="w-5 h-5 rounded-full border-2 border-foreground border-t-transparent animate-spin" />
         ) : (
           <>
             <Sparkles className="w-5 h-5" />

@@ -17,24 +17,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: '聚会公约数 - Gather GCD',
+  title: 'seeyou',
   description: '极简免登录协同，7x3 矩阵涂色寻找时间最大公约数',
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
   },
 }
 
