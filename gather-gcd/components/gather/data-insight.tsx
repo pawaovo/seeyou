@@ -116,7 +116,7 @@ export function DataInsight({ allSelections, currentUser }: DataInsightProps) {
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 10 }}
-            className="p-4 space-y-2 max-h-80 overflow-y-auto"
+            className="p-4 space-y-2 max-h-[50vh] overflow-y-auto"
           >
             {leaderboard.length === 0 ? (
               <p className="text-center text-muted-foreground py-8 text-sm">
@@ -178,7 +178,7 @@ export function DataInsight({ allSelections, currentUser }: DataInsightProps) {
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -10 }}
-            className="p-4 space-y-3 max-h-80 overflow-y-auto"
+            className="p-4 space-y-3 max-h-[50vh] overflow-y-auto"
           >
             {members.length === 0 ? (
               <p className="text-center text-muted-foreground py-8 text-sm">

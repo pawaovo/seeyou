@@ -85,7 +85,7 @@ export function StickyHeader({
               whileTap={{ scale: 0.98 }}
               className={`shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                 hasUnsavedChanges
-                  ? "bg-primary text-primary-foreground shadow-md hover:shadow-lg"
+                  ? "bg-zen-sage/40 text-foreground shadow-sm hover:bg-zen-sage/50"
                   : "bg-muted text-muted-foreground cursor-not-allowed"
               }`}
             >

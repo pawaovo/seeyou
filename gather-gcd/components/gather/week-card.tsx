@@ -58,6 +58,10 @@ export function WeekCard({
   const [draggedSlots, setDraggedSlots] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Touch direction detection - only horizontal swipes trigger selection
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const [isHorizontalSwipe, setIsHorizontalSwipe] = useState(false);
+
   const getSlotKey = (date: string, slot: "morning" | "afternoon" | "evening") => `${date}:${slot}`;
 
   const parseSlotKey = (key: string): { date: string; slot: "morning" | "afternoon" | "evening" } => {
@@ -128,14 +132,45 @@ export function WeekCard({
   }, [isDragging, draggedSlots, dragMode, onBatchToggle, onToggleSlot, selectedSlotsSet]);
 
   // Handle touch/mouse events for drag selection
+  // Only horizontal swipes trigger selection, vertical swipes allow page scrolling
   const handlePointerDown = (dateStr: string, slot: "morning" | "afternoon" | "evening") => (e: React.PointerEvent) => {
-    e.preventDefault();
+    // Record start position for direction detection
+    touchStartRef.current = { x: e.clientX, y: e.clientY };
+    setIsHorizontalSwipe(false);
+
+    // Don't prevent default yet - wait to determine swipe direction
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     handleDragStart(dateStr, slot);
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDragging || !containerRef.current) return;
+
+    // Determine swipe direction on first significant movement
+    if (touchStartRef.current && !isHorizontalSwipe) {
+      const deltaX = Math.abs(e.clientX - touchStartRef.current.x);
+      const deltaY = Math.abs(e.clientY - touchStartRef.current.y);
+      const threshold = 10; // pixels before determining direction
+
+      if (deltaX > threshold || deltaY > threshold) {
+        if (deltaX > deltaY) {
+          // Horizontal swipe - enable selection mode
+          setIsHorizontalSwipe(true);
+        } else {
+          // Vertical swipe - cancel drag and allow scrolling
+          setIsDragging(false);
+          setDraggedSlots(new Set());
+          touchStartRef.current = null;
+          return;
+        }
+      } else {
+        // Not enough movement yet
+        return;
+      }
+    }
+
+    // Only process horizontal swipes
+    if (!isHorizontalSwipe) return;
 
     const element = document.elementFromPoint(e.clientX, e.clientY);
     if (element) {
@@ -148,6 +183,8 @@ export function WeekCard({
   };
 
   const handlePointerUp = () => {
+    touchStartRef.current = null;
+    setIsHorizontalSwipe(false);
     handleDragEnd();
   };
 
@@ -182,7 +219,8 @@ export function WeekCard({
       {/* Bento grid with drag support */}
       <div
         ref={containerRef}
-        className="space-y-2 touch-none select-none"
+        className="space-y-2 select-none"
+        style={{ touchAction: "pan-y" }}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}

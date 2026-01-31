@@ -608,10 +608,10 @@ function AuthGateWithVerification({
                   type="button"
                   onClick={handleNicknameSubmit}
                   disabled={nickname.trim().length < 1}
-                  className="mt-6 w-full py-4 rounded-2xl bg-primary text-primary-foreground font-sans text-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
+                  className="mt-6 w-full py-4 rounded-2xl border-2 border-foreground/20 text-foreground font-medium text-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:border-foreground/40 hover:bg-foreground/5"
                   whileTap={{ scale: 0.98 }}
                 >
-                  进入聚会
+                  加入活动
                 </motion.button>
               </motion.div>
             </motion.div>
