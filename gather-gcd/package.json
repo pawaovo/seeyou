@@ -6,7 +6,8 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start"
+    "start": "next start",
+    "deploy": "opennextjs-cloudflare build && wrangler pages deploy"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
